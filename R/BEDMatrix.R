@@ -71,7 +71,9 @@ map <- function(path, n = NULL, p = NULL) {
         # TODO: test if p is positive
         colnames <- NULL
     }
-    .Call(C_map, path, n, p)
+    obj <- .Call(C_map, path, n, p)
+    dimnames(obj) <- list(rownames, colnames)
+    return(obj)
 }
 
 #' @export
