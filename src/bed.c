@@ -32,7 +32,7 @@ int has_valid_dimensions(size_t length, int nrows, int ncols) {
  // is the number of variants and N is the number of samples.
     int num_bytes_per_block = ceil((double) nrows / PLINK_BED_GENOTYPES_PER_BYTE);
  // Check if given dimensions match the file
-    if ((ncols * num_bytes_per_block) != (length - PLINK_BED_HEADER_LENGTH)) {
+    if (((size_t) ncols * num_bytes_per_block) != (length - PLINK_BED_HEADER_LENGTH)) {
         retval = -1;
     }
     return retval;
