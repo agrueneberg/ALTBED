@@ -38,7 +38,7 @@ int has_valid_dimensions(size_t length, int nrows, int ncols) {
     return retval;
 }
 
-int extract_genotype(uint8_t *bed, int n, int k, int na_value) {
+int extract_genotype(uint8_t *bed, int n, size_t k, int na_value) {
  // Convert index from one-dimensional to two-dimensional
     int i = k % n;
     int j = k / n;
