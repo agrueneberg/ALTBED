@@ -4,4 +4,3 @@ License: MIT + file LICENSE
 Title: An ALTREP Reimplementation of BEDMatrix
 Description: A toy project to get some ALTREP experience.
 Authors@R: person("Alexander", "Grueneberg", email = "alexander.grueneberg@googlemail.com", role = c("aut", "cre"))
-RoxygenNote: 6.1.1

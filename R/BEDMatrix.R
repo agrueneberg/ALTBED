@@ -1,7 +1,6 @@
 # Delimiters used in PED files
 delims <- "[ \t]"
 
-#' @export
 map <- function(path, n = NULL, p = NULL) {
     path <- path.expand(path)
     if (!file.exists(path)) {
@@ -76,7 +75,6 @@ map <- function(path, n = NULL, p = NULL) {
     return(obj)
 }
 
-#' @export
 unmap <- function(x) {
     .Call(C_unmap, x)
 }
