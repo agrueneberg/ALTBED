@@ -8,6 +8,10 @@
 #define PLINK_BED_HEADER_LENGTH 3
 #define PLINK_BED_GENOTYPES_PER_BYTE 4
 
+int compute_num_bytes_per_variant(int nrows) {
+    return ceil((double) nrows / PLINK_BED_GENOTYPES_PER_BYTE);
+}
+
 int is_bed_file(uint8_t *bed) {
  // Check magic number
     if (!(bed[0] == 0x6c && bed[1] == 0x1b)) {
@@ -30,27 +34,26 @@ int has_valid_dimensions(size_t length, int nrows, int ncols) {
     int retval = 0;
  // File is a sequence of V blocks of N/4 (rounded up) bytes each, where V
  // is the number of variants and N is the number of samples.
-    int num_bytes_per_block = ceil((double) nrows / PLINK_BED_GENOTYPES_PER_BYTE);
+    int num_bytes_per_variant = compute_num_bytes_per_variant(nrows);
  // Check if given dimensions match the file
-    if (((size_t) ncols * num_bytes_per_block) != (length - PLINK_BED_HEADER_LENGTH)) {
+    if (((size_t) ncols * num_bytes_per_variant) != (length - PLINK_BED_HEADER_LENGTH)) {
         retval = -1;
     }
     return retval;
 }
 
-int extract_genotype(uint8_t *bed, int n, size_t k, int na_value) {
+int extract_genotype(uint8_t *bed, int nrows, int num_bytes_per_variant, size_t k, int na_value) {
  // Convert index from one-dimensional to two-dimensional
-    int i = k % n;
-    int j = k / n;
+    int i = k % nrows;
+    int j = k / nrows;
  // Each byte contains 4 genotypes; adjust indices
-    int i_bytes = i / PLINK_BED_GENOTYPES_PER_BYTE;
-    int n_bytes = n / PLINK_BED_GENOTYPES_PER_BYTE + (n % PLINK_BED_GENOTYPES_PER_BYTE != 0); // fast ceil for int
-    int i_genotypes = 2 * (i - i_bytes * PLINK_BED_GENOTYPES_PER_BYTE);
+    int which_byte = i / PLINK_BED_GENOTYPES_PER_BYTE;
+    int which_genotype = i % PLINK_BED_GENOTYPES_PER_BYTE;
  // Get byte from mapping
-    uint8_t genotypes = bed[PLINK_BED_HEADER_LENGTH + (j * n_bytes + i_bytes)];
+    uint8_t genotypes = bed[PLINK_BED_HEADER_LENGTH + (j * num_bytes_per_variant + which_byte)];
  // Extract genotype from byte by shifting bit pair of interest to the
  // right, then masking with 11
-    uint8_t genotype = genotypes >> i_genotypes & 3;
+    uint8_t genotype = genotypes >> (2 * which_genotype) & 0x03;
  // Remap genotype value to resemble RAW file, i.e. 0 indicates homozygous
  // major allele, 1 indicates heterozygous, and 2 indicates homozygous minor
  // allele. In BED, the coding is different: homozygous minor allele is 0

@@ -162,6 +162,7 @@ static const void *bedmatrix_Dataptr_or_null(SEXP x) {
 static SEXP bedmatrix_Extract_subset(SEXP x, SEXP i, SEXP call) {
     uint8_t *ptr = BEDMATRIX_ADDR(x);
     int nrows = BEDMATRIX_NROWS(x);
+    int num_bytes_per_variant = compute_num_bytes_per_variant(nrows);
     R_xlen_t nx = Rf_xlength(x);
     R_xlen_t ni = Rf_xlength(i);
     SEXP result = PROTECT(Rf_allocVector(INTSXP, ni));
@@ -173,7 +174,7 @@ static SEXP bedmatrix_Extract_subset(SEXP x, SEXP i, SEXP call) {
             ii = pi[ci];
             if (0 < ii && ii <= nx) {
                 ii--;
-                presult[ci] = extract_genotype(ptr, nrows, ii, NA_INTEGER);
+                presult[ci] = extract_genotype(ptr, nrows, num_bytes_per_variant, ii, NA_INTEGER);
             } else {
                 presult[ci] = NA_INTEGER;
             }
@@ -184,7 +185,7 @@ static SEXP bedmatrix_Extract_subset(SEXP x, SEXP i, SEXP call) {
             double di = pi[ci];
             ii = (R_xlen_t) (di - 1);
             if (R_FINITE(di) && 0 <= ii && ii < nx) {
-                presult[ci] = extract_genotype(ptr, nrows, ii, NA_INTEGER);
+                presult[ci] = extract_genotype(ptr, nrows, num_bytes_per_variant, ii, NA_INTEGER);
             } else {
                 presult[ci] = NA_INTEGER;
             }
@@ -201,7 +202,8 @@ static SEXP bedmatrix_Extract_subset(SEXP x, SEXP i, SEXP call) {
 static int bedmatrix_Elt(SEXP x, R_xlen_t i) {
     uint8_t *ptr = BEDMATRIX_ADDR(x);
     int nrows = BEDMATRIX_NROWS(x);
-    return extract_genotype(ptr, nrows, i, NA_INTEGER);
+    int num_bytes_per_variant = compute_num_bytes_per_variant(nrows);
+    return extract_genotype(ptr, nrows, num_bytes_per_variant, i, NA_INTEGER);
 }
 
 
