@@ -115,7 +115,7 @@ static SEXP make_bedmatrix(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
         Rf_error("n or p does not match the dimensions of the file");
         unmap_region(&mapped_region); // ignore errors
     }
- // Create BEDMatrix object
+ // Create ALTBED object
     SEXP state = PROTECT(make_bedmatrix_state(s_path, mapped_region.length, s_nrows, s_ncols));
     SEXP eptr = PROTECT(make_bedmatrix_eptr(mapped_region.addr, state));
     SEXP altrep = PROTECT(R_new_altrep(altrep_class_bedmatrix, eptr, state));
@@ -217,7 +217,7 @@ static int bedmatrix_Elt(SEXP x, R_xlen_t i) {
  * Class Creation
  */
 static void init_bedmatrix_class(DllInfo *dll) {
-    R_altrep_class_t class = R_make_altinteger_class("BEDMatrix", "ALTBED", dll);
+    R_altrep_class_t class = R_make_altinteger_class("ALTBED", "ALTBED", dll);
     altrep_class_bedmatrix = class;
  // Override ALTREP methods
     R_set_altrep_Length_method(class, bedmatrix_Length);
@@ -236,7 +236,7 @@ static void init_bedmatrix_class(DllInfo *dll) {
 /**
  * Routines
  */
-SEXP C_map(SEXP path, SEXP nrows, SEXP ncols) {
+SEXP C_ALTBED(SEXP path, SEXP nrows, SEXP ncols) {
     return make_bedmatrix(path, nrows, ncols);
 }
 
@@ -245,7 +245,7 @@ SEXP C_map(SEXP path, SEXP nrows, SEXP ncols) {
  * Shared Library Init
  */
 static const R_CallMethodDef CallEntries[] = {
-    {"C_map", (DL_FUNC) &C_map, 3},
+    {"C_ALTBED", (DL_FUNC) &C_ALTBED, 3},
     {NULL, NULL, 0}
 };
 

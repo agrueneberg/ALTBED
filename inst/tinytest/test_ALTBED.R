@@ -13,11 +13,11 @@ parseRaw <- function(path) {
     return(geno)
 }
 
-expect_error(map(path = filesetPath, n = -1))
-expect_error(map(path = filesetPath, p = -1))
-expect_error(map(path = filesetPath, n = -1, p = -1))
+expect_error(ALTBED(path = filesetPath, n = -1))
+expect_error(ALTBED(path = filesetPath, p = -1))
+expect_error(ALTBED(path = filesetPath, n = -1, p = -1))
 
 raw <- parseRaw(paste0(filesetPath, ".raw"))
-bed <- suppressMessages(map(path = filesetPath))
+bed <- suppressMessages(ALTBED(path = filesetPath))
 
 expect_equal(raw[1], bed[1])

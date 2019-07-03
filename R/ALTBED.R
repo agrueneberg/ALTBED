@@ -1,7 +1,7 @@
 # Delimiters used in .fam and .bim files
 delims <- "[ \t]"
 
-map <- function(path, n = NULL, p = NULL, simple_names = FALSE) {
+ALTBED <- function(path, n = NULL, p = NULL, simple_names = FALSE) {
     path <- path.expand(path)
     if (!file.exists(path)) {
         # Try to add extension (common in PLINK)
@@ -104,7 +104,7 @@ map <- function(path, n = NULL, p = NULL, simple_names = FALSE) {
         p <- as.integer(p)
         colnames <- NULL
     }
-    obj <- .Call(C_map, path, n, p)
+    obj <- .Call(C_ALTBED, path, n, p)
     dimnames(obj) <- list(rownames, colnames)
     return(obj)
 }

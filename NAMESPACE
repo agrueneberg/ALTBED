@@ -1,2 +1,2 @@
-export(map)
+export(ALTBED)
 useDynLib(ALTBED, .registration = TRUE)
