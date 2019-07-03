@@ -42,13 +42,13 @@ int has_valid_dimensions(size_t length, int nrows, int ncols) {
     return retval;
 }
 
-int extract_genotype(uint8_t *bed, int nrows, int num_bytes_per_variant, size_t k, int na_value) {
+int extract_genotype(uint8_t *bed, int nrows, int num_bytes_per_variant, ptrdiff_t k, int na_value) {
  // Convert index from one-dimensional to two-dimensional
-    int i = k % nrows;
-    int j = k / nrows;
+    ptrdiff_t i = k % nrows;
+    ptrdiff_t j = k / nrows;
  // Each byte contains 4 genotypes; adjust indices
-    int which_byte = i / PLINK_BED_GENOTYPES_PER_BYTE;
-    int which_genotype = i % PLINK_BED_GENOTYPES_PER_BYTE;
+    ptrdiff_t which_byte = i / PLINK_BED_GENOTYPES_PER_BYTE;
+    ptrdiff_t which_genotype = i % PLINK_BED_GENOTYPES_PER_BYTE;
  // Get byte from mapping
     uint8_t genotypes = bed[PLINK_BED_HEADER_LENGTH + (j * num_bytes_per_variant + which_byte)];
  // Extract genotype from byte by shifting bit pair of interest to the

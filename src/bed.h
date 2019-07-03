@@ -10,6 +10,6 @@ int is_bed_file(uint8_t *bed);
 
 int has_valid_dimensions(size_t length, int nrows, int ncols);
 
-int extract_genotype(uint8_t *bed, int nrows, int num_bytes_per_variant, size_t k, int na_value);
+int extract_genotype(uint8_t *bed, int nrows, int num_bytes_per_variant, ptrdiff_t k, int na_value);
 
 #endif
