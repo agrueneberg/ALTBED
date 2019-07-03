@@ -12,6 +12,10 @@ parseRaw <- function(path) {
     return(geno)
 }
 
+expect_error(map(path = paste0(extdataPath, "/example.bed"), n = -1))
+expect_error(map(path = paste0(extdataPath, "/example.bed"), p = -1))
+expect_error(map(path = paste0(extdataPath, "/example.bed"), n = -1, p = -1))
+
 raw <- parseRaw(paste0(extdataPath, "/example.raw"))
 bed <- suppressMessages(map(path = paste0(extdataPath, "/example.bed")))
 

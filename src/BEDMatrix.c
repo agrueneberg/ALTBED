@@ -67,7 +67,13 @@ static SEXP make_bedmatrix_eptr(void *p, SEXP state) {
 static SEXP make_bedmatrix(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
     const char *path = CHAR(Rf_asChar(s_path));
     int nrows = Rf_asInteger(s_nrows);
+    if (nrows < 0) {
+        Rf_error("nrows has to be nonnegative");
+    }
     int ncols = Rf_asInteger(s_ncols);
+    if (ncols < 0) {
+        Rf_error("ncols has to be nonnegative");
+    }
  // Map file
     struct mapped_region mapped_region;
     if (map_region(path, &mapped_region) == -1) {

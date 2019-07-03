@@ -56,7 +56,6 @@ map <- function(path, n = NULL, p = NULL, simple_names = FALSE) {
         }
     } else {
         n <- as.integer(n)
-        # TODO: test if n is positive
         rownames <- NULL
     }
     if (is.null(p)) {
@@ -103,7 +102,6 @@ map <- function(path, n = NULL, p = NULL, simple_names = FALSE) {
         }
     } else {
         p <- as.integer(p)
-        # TODO: test if p is positive
         colnames <- NULL
     }
     obj <- .Call(C_map, path, n, p)
