@@ -108,7 +108,3 @@ map <- function(path, n = NULL, p = NULL, simple_names = FALSE) {
     dimnames(obj) <- list(rownames, colnames)
     return(obj)
 }
-
-unmap <- function(x) {
-    .Call(C_unmap, x)
-}

@@ -240,18 +240,12 @@ SEXP C_map(SEXP path, SEXP nrows, SEXP ncols) {
     return make_bedmatrix(path, nrows, ncols);
 }
 
-SEXP C_unmap(SEXP o) {
-    unmake_bedmatrix(BEDMATRIX_EPTR(o), BEDMATRIX_STATE(o));
-    return R_NilValue;
-}
-
 
 /**
  * Shared Library Init
  */
 static const R_CallMethodDef CallEntries[] = {
     {"C_map", (DL_FUNC) &C_map, 3},
-    {"C_unmap", (DL_FUNC) &C_unmap, 1},
     {NULL, NULL, 0}
 };
 
