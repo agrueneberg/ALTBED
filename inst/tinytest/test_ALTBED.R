@@ -1,4 +1,5 @@
 extdataPath <- system.file("extdata", package = "ALTBED")
+filesetPath <- paste0(extdataPath, "/example")
 
 parseRaw <- function(path) {
     lines <- strsplit(readLines(path), " ")
@@ -12,11 +13,11 @@ parseRaw <- function(path) {
     return(geno)
 }
 
-expect_error(map(path = paste0(extdataPath, "/example.bed"), n = -1))
-expect_error(map(path = paste0(extdataPath, "/example.bed"), p = -1))
-expect_error(map(path = paste0(extdataPath, "/example.bed"), n = -1, p = -1))
+expect_error(map(path = filesetPath, n = -1))
+expect_error(map(path = filesetPath, p = -1))
+expect_error(map(path = filesetPath, n = -1, p = -1))
 
-raw <- parseRaw(paste0(extdataPath, "/example.raw"))
-bed <- suppressMessages(map(path = paste0(extdataPath, "/example.bed")))
+raw <- parseRaw(paste0(filesetPath, ".raw"))
+bed <- suppressMessages(map(path = filesetPath))
 
 expect_equal(raw[1], bed[1])
