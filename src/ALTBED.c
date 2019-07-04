@@ -133,7 +133,7 @@ static SEXP make_bedmatrix(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
  * ALTREP Methods
  */
 static R_xlen_t bedmatrix_Length(SEXP x) {
-    return BEDMATRIX_NROWS(x) * BEDMATRIX_NCOLS(x);
+    return (R_xlen_t) BEDMATRIX_NROWS(x) * BEDMATRIX_NCOLS(x);
 }
 
 static SEXP bedmatrix_Duplicate(SEXP x, Rboolean deep) {
