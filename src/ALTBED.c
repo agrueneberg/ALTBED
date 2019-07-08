@@ -9,19 +9,19 @@
 #include "mapping.h"
 #include "bed.h"
 
-#define BEDMATRIX_EPTR(x) R_altrep_data1(x)
-#define BEDMATRIX_STATE(x) R_altrep_data2(x)
-#define BEDMATRIX_STATE_PATH(x) CAR(x)
-#define BEDMATRIX_STATE_LENGTH(x) CADR(x)
-#define BEDMATRIX_STATE_NROWS(x) CADDR(x)
-#define BEDMATRIX_STATE_NCOLS(x) CADDDR(x)
-#define BEDMATRIX_NROWS(x) Rf_asInteger(BEDMATRIX_STATE_NROWS(BEDMATRIX_STATE(x)))
-#define BEDMATRIX_NCOLS(x) Rf_asInteger(BEDMATRIX_STATE_NCOLS(BEDMATRIX_STATE(x)))
+#define ALTBED_EPTR(x) R_altrep_data1(x)
+#define ALTBED_STATE(x) R_altrep_data2(x)
+#define ALTBED_STATE_PATH(x) CAR(x)
+#define ALTBED_STATE_LENGTH(x) CADR(x)
+#define ALTBED_STATE_NROWS(x) CADDR(x)
+#define ALTBED_STATE_NCOLS(x) CADDDR(x)
+#define ALTBED_NROWS(x) Rf_asInteger(ALTBED_STATE_NROWS(ALTBED_STATE(x)))
+#define ALTBED_NCOLS(x) Rf_asInteger(ALTBED_STATE_NCOLS(ALTBED_STATE(x)))
 
-static R_altrep_class_t altrep_class_bedmatrix;
+static R_altrep_class_t altrep_class_altbed;
 
-static void *BEDMATRIX_ADDR(SEXP x) {
-    SEXP eptr = BEDMATRIX_EPTR(x);
+static void *ALTBED_ADDR(SEXP x) {
+    SEXP eptr = ALTBED_EPTR(x);
     void *addr = R_ExternalPtrAddr(eptr);
     if (addr == NULL) {
         Rf_error("object has been unmapped");
@@ -32,39 +32,39 @@ static void *BEDMATRIX_ADDR(SEXP x) {
 /**
  * Object Creation
  */
-static void unmake_bedmatrix(SEXP eptr, SEXP state) {
+static void unmake_altbed(SEXP eptr, SEXP state) {
     struct mapped_region mapped_region;
     mapped_region.addr = R_ExternalPtrAddr(eptr);
-    mapped_region.length = Rf_asReal(BEDMATRIX_STATE_LENGTH(state));
+    mapped_region.length = Rf_asReal(ALTBED_STATE_LENGTH(state));
     if (unmap_region(&mapped_region) == -1) {
         Rf_error("could not unmap region");
     }
     R_ClearExternalPtr(eptr);
 }
 
-static void bedmatrix_finalizer(SEXP eptr) {
+static void altbed_finalizer(SEXP eptr) {
     if (!R_ExternalPtrAddr(eptr)) {
         return;
     }
     SEXP state = R_ExternalPtrProtected(eptr);
-    unmake_bedmatrix(eptr, state);
+    unmake_altbed(eptr, state);
 }
 
-static SEXP make_bedmatrix_state(SEXP s_path, size_t length, SEXP s_nrows, SEXP s_ncols) {
+static SEXP make_altbed_state(SEXP s_path, size_t length, SEXP s_nrows, SEXP s_ncols) {
     SEXP s_length = PROTECT(Rf_ScalarReal(length));
     SEXP s_state = PROTECT(Rf_list4(s_path, s_length, s_nrows, s_ncols));
     UNPROTECT(2); // s_length, s_state
     return s_state;
 }
 
-static SEXP make_bedmatrix_eptr(void *p, SEXP state) {
+static SEXP make_altbed_eptr(void *p, SEXP state) {
     SEXP eptr = PROTECT(R_MakeExternalPtr(p, R_NilValue, state)); // protect state for use by the finalizer
-    R_RegisterCFinalizerEx(eptr, bedmatrix_finalizer, TRUE);
+    R_RegisterCFinalizerEx(eptr, altbed_finalizer, TRUE);
     UNPROTECT(1); // eptr
     return eptr;
 }
 
-static SEXP make_bedmatrix(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
+static SEXP make_altbed(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
     const char *path = CHAR(Rf_asChar(s_path));
     int nrows = Rf_asInteger(s_nrows);
     if (nrows < 0) {
@@ -116,9 +116,9 @@ static SEXP make_bedmatrix(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
         unmap_region(&mapped_region); // ignore errors
     }
  // Create ALTBED object
-    SEXP state = PROTECT(make_bedmatrix_state(s_path, mapped_region.length, s_nrows, s_ncols));
-    SEXP eptr = PROTECT(make_bedmatrix_eptr(mapped_region.addr, state));
-    SEXP altrep = PROTECT(R_new_altrep(altrep_class_bedmatrix, eptr, state));
+    SEXP state = PROTECT(make_altbed_state(s_path, mapped_region.length, s_nrows, s_ncols));
+    SEXP eptr = PROTECT(make_altbed_eptr(mapped_region.addr, state));
+    SEXP altrep = PROTECT(R_new_altrep(altrep_class_altbed, eptr, state));
     MARK_NOT_MUTABLE(altrep); // always duplicate
     SEXP dim = PROTECT(Rf_allocVector(INTSXP, 2));
     INTEGER(dim)[0] = nrows;
@@ -132,42 +132,42 @@ static SEXP make_bedmatrix(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
 /**
  * ALTREP Methods
  */
-static R_xlen_t bedmatrix_Length(SEXP x) {
-    return (R_xlen_t) BEDMATRIX_NROWS(x) * BEDMATRIX_NCOLS(x);
+static R_xlen_t altbed_Length(SEXP x) {
+    return (R_xlen_t) ALTBED_NROWS(x) * ALTBED_NCOLS(x);
 }
 
-static SEXP bedmatrix_Duplicate(SEXP x, Rboolean deep) {
+static SEXP altbed_Duplicate(SEXP x, Rboolean deep) {
  // Not sure if this is OK...
     return x;
 }
 
-static SEXP bedmatrix_Serialized_state(SEXP x) {
-    return BEDMATRIX_STATE(x);
+static SEXP altbed_Serialized_state(SEXP x) {
+    return ALTBED_STATE(x);
 }
 
-static SEXP bedmatrix_Unserialize(SEXP class, SEXP state) {
-    SEXP path = BEDMATRIX_STATE_PATH(state);
-    SEXP nrows = BEDMATRIX_STATE_NROWS(state);
-    SEXP ncols = BEDMATRIX_STATE_NCOLS(state);
-    return make_bedmatrix(path, nrows, ncols);
+static SEXP altbed_Unserialize(SEXP class, SEXP state) {
+    SEXP path = ALTBED_STATE_PATH(state);
+    SEXP nrows = ALTBED_STATE_NROWS(state);
+    SEXP ncols = ALTBED_STATE_NCOLS(state);
+    return make_altbed(path, nrows, ncols);
 }
 
 
 /**
  * ALTVEC Methods
  */
-static void *bedmatrix_Dataptr(SEXP x, Rboolean writeable) {
+static void *altbed_Dataptr(SEXP x, Rboolean writeable) {
     Rf_error("cannot access data pointer for this ALTVEC object: contents of a .bed file cannot be cast to int or double -- this is a current limitation of the ALTREP framework");
 }
 
-static const void *bedmatrix_Dataptr_or_null(SEXP x) {
+static const void *altbed_Dataptr_or_null(SEXP x) {
  // No pointer available
     return NULL;
 }
 
-static SEXP bedmatrix_Extract_subset(SEXP x, SEXP i, SEXP call) {
-    uint8_t *ptr = BEDMATRIX_ADDR(x);
-    int nrows = BEDMATRIX_NROWS(x);
+static SEXP altbed_Extract_subset(SEXP x, SEXP i, SEXP call) {
+    uint8_t *ptr = ALTBED_ADDR(x);
+    int nrows = ALTBED_NROWS(x);
     int num_bytes_per_variant = compute_num_bytes_per_variant(nrows);
     R_xlen_t nx = Rf_xlength(x);
     R_xlen_t ni = Rf_xlength(i);
@@ -205,9 +205,9 @@ static SEXP bedmatrix_Extract_subset(SEXP x, SEXP i, SEXP call) {
 /**
  * ALTINTEGER Methods
  */
-static int bedmatrix_Elt(SEXP x, R_xlen_t i) {
-    uint8_t *ptr = BEDMATRIX_ADDR(x);
-    int nrows = BEDMATRIX_NROWS(x);
+static int altbed_Elt(SEXP x, R_xlen_t i) {
+    uint8_t *ptr = ALTBED_ADDR(x);
+    int nrows = ALTBED_NROWS(x);
     int num_bytes_per_variant = compute_num_bytes_per_variant(nrows);
     return extract_genotype(ptr, nrows, num_bytes_per_variant, i, NA_INTEGER);
 }
@@ -216,20 +216,20 @@ static int bedmatrix_Elt(SEXP x, R_xlen_t i) {
 /**
  * Class Creation
  */
-static void init_bedmatrix_class(DllInfo *dll) {
+static void init_altbed_class(DllInfo *dll) {
     R_altrep_class_t class = R_make_altinteger_class("ALTBED", "ALTBED", dll);
-    altrep_class_bedmatrix = class;
+    altrep_class_altbed = class;
  // Override ALTREP methods
-    R_set_altrep_Length_method(class, bedmatrix_Length);
-    R_set_altrep_Duplicate_method(class, bedmatrix_Duplicate);
-    R_set_altrep_Serialized_state_method(class, bedmatrix_Serialized_state);
-    R_set_altrep_Unserialize_method(class, bedmatrix_Unserialize);
+    R_set_altrep_Length_method(class, altbed_Length);
+    R_set_altrep_Duplicate_method(class, altbed_Duplicate);
+    R_set_altrep_Serialized_state_method(class, altbed_Serialized_state);
+    R_set_altrep_Unserialize_method(class, altbed_Unserialize);
  // Override ALTVEC methods
-    R_set_altvec_Dataptr_method(class, bedmatrix_Dataptr);
-    R_set_altvec_Dataptr_or_null_method(class, bedmatrix_Dataptr_or_null);
-    R_set_altvec_Extract_subset_method(class, bedmatrix_Extract_subset);
+    R_set_altvec_Dataptr_method(class, altbed_Dataptr);
+    R_set_altvec_Dataptr_or_null_method(class, altbed_Dataptr_or_null);
+    R_set_altvec_Extract_subset_method(class, altbed_Extract_subset);
  // Override ALTINTEGER methods
-    R_set_altinteger_Elt_method(class, bedmatrix_Elt);
+    R_set_altinteger_Elt_method(class, altbed_Elt);
 }
 
 
@@ -237,7 +237,7 @@ static void init_bedmatrix_class(DllInfo *dll) {
  * Routines
  */
 SEXP C_ALTBED(SEXP path, SEXP nrows, SEXP ncols) {
-    return make_bedmatrix(path, nrows, ncols);
+    return make_altbed(path, nrows, ncols);
 }
 
 
@@ -250,6 +250,6 @@ static const R_CallMethodDef CallEntries[] = {
 };
 
 void R_init_ALTBED(DllInfo *dll) {
-    init_bedmatrix_class(dll);
+    init_altbed_class(dll);
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
 }
