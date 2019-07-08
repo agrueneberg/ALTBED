@@ -15,8 +15,6 @@
 #define ALTBED_STATE_LENGTH(x) CADR(x)
 #define ALTBED_STATE_NROWS(x) CADDR(x)
 #define ALTBED_STATE_NCOLS(x) CADDDR(x)
-#define ALTBED_NROWS(x) Rf_asInteger(ALTBED_STATE_NROWS(ALTBED_STATE(x)))
-#define ALTBED_NCOLS(x) Rf_asInteger(ALTBED_STATE_NCOLS(ALTBED_STATE(x)))
 
 static R_altrep_class_t altrep_class_altbed;
 
@@ -27,6 +25,18 @@ static void *ALTBED_ADDR(SEXP x) {
         Rf_error("object has been unmapped");
     }
     return addr;
+}
+
+static int ALTBED_NROWS(SEXP x) {
+    SEXP state = ALTBED_STATE(x);
+    SEXP nrows = ALTBED_STATE_NROWS(state);
+    return Rf_asInteger(nrows);
+}
+
+static int ALTBED_NCOLS(SEXP x) {
+    SEXP state = ALTBED_STATE(x);
+    SEXP ncols = ALTBED_STATE_NCOLS(state);
+    return Rf_asInteger(ncols);
 }
 
 /**
