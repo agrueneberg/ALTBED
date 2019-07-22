@@ -45,7 +45,8 @@ static int ALTBED_NCOLS(SEXP x) {
 static void unmake_altbed(SEXP eptr, SEXP state) {
     struct mapped_region mapped_region;
     mapped_region.addr = R_ExternalPtrAddr(eptr);
-    mapped_region.length = Rf_asReal(ALTBED_STATE_LENGTH(state));
+    SEXP length = ALTBED_STATE_LENGTH(state);
+    mapped_region.length = Rf_asReal(length);
     if (unmap_region(&mapped_region) == -1) {
         Rf_error("could not unmap region");
     }
@@ -105,6 +106,9 @@ static SEXP make_altbed(SEXP s_path, SEXP s_nrows, SEXP s_ncols) {
                 break;
             case 6:
                 Rf_error("could not close file");
+                break;
+            case 7:
+                Rf_error("file is not a regular file");
                 break;
         }
     }

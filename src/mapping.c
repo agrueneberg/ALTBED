@@ -13,12 +13,18 @@
 
 int map_region(const char *pathname, struct mapped_region *mapped_region) {
     int retval = 0;
- // Get file length
+ // Get file status
     struct stat sb;
     if (stat(pathname, &sb) == -1) {
         errno = 1;
         return -1;
     }
+ // Test if file is a regular file
+    if (!S_ISREG(sb.st_mode)) {
+        errno = 7;
+        return -1;
+    }
+ // Get file length
     mapped_region->length = sb.st_size;
  // Map file
 #ifdef _WIN32
